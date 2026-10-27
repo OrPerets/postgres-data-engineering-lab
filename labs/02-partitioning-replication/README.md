@@ -30,9 +30,9 @@ Replication is asynchronous; a committed row can take a moment to appear. Standb
 
 ## Assignments
 
-- [Extended assignment](assignments/STUDENT_ASSIGNMENT_V2.md)
+- [Student assignment](assignments/STUDENT_ASSIGNMENT.md)
 - [Student SQL worksheet](sql/student_exercises.sql)
-- [Instructor notes in Hebrew (no answers)](assignments/INSTRUCTOR_NOTES_V2_HE.md)
+- [Instructor notes in Hebrew (no answers)](assignments/INSTRUCTOR_NOTES_HE.md)
 
 Optional after generating data: `docker compose exec -T primary psql -U lab -d engineering < sql/04_lab_extensions.sql`.
 
