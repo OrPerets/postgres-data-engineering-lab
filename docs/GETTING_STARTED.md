@@ -28,3 +28,20 @@ The same interface works for all labs: `make setup`, `make demo`, `make test`, `
 | 06 | `labs/06-tfidf` | Python + optional PostgreSQL |
 
 **Note:** These commands are a unified starter interface, not a full assignment autograder. Do not treat passing demo checks as confirmation that your own SQL answers are correct.
+
+## Simplest way to start each lab
+
+Run these from the **repository root** (not a lab subdirectory):
+
+| Lab | One command |
+|---|---|
+| SQL | `make lab-sql` |
+| Partitions and Replicas | `make lab-partitions` |
+| DWH and ETL | `make lab-dwh` |
+| MapReduce | `make lab-mapreduce` |
+| PageRank | `make lab-pagerank` |
+| TF-IDF | `make lab-tfidf` |
+
+Initializers bring up Docker services where needed, wait for health, create missing data, and run basic checks. They **skip table creation if the key tables already exist**, so existing work is not intentionally overwritten. They do not repair partially initialized or modified schemas automatically. Python labs run their reference demo but do not complete student exercises. Full test suites may fail on deliberately blank student code.
+
+To remove a lab's database state intentionally, use `CONFIRM_RESET=YES make reset LAB=01-relational-sql` and then `make lab-sql`. Reset is destructive. Run only one resource-heavy lab at a time.
