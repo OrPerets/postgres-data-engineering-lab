@@ -11,6 +11,7 @@ A modular hands-on PostgreSQL teaching repository for GitHub Codespaces. Each la
 | 03 | [Data Warehouse & ETL](labs/03-dwh-etl/README.md) | Raw vs staging, STTM, star schema, dimensional ETL, quality checks, idempotency | `cd labs/03-dwh-etl` |
 | 04 | [MapReduce](labs/04-mapreduce/README.md) | Map, shuffle, reduce, safe combiners, skew, distributed mean/variance | `cd labs/04-mapreduce` |
 | 05 | [PageRank](labs/05-pagerank/README.md) | Directed graphs, iterative PageRank, damping, dangling nodes, MapReduce iterations | `cd labs/05-pagerank` |
+| 06 | [Regex & TF-IDF](labs/06-tfidf/README.md) | Regex, tokenization, four MapReduce stages, TF-IDF and PostgreSQL SQL | `cd labs/06-tfidf` |
 
 ## Open in Codespaces
 
