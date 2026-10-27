@@ -42,3 +42,16 @@ The demo simulates this pipeline in one process. It does not run Hadoop or netwo
 
 ## Exercises and safe data
 See [STUDENT_ASSIGNMENT.md](STUDENT_ASSIGNMENT.md) and [student_tasks.py](student_tasks.py). Synthetic documents are provided in the source code and SQL. The lecture refers to `tf-idf.sql`, but that file was **not provided** with the lecture upload; `sql/02_reference_query.sql` is a new PostgreSQL implementation built for this lab, not the original lecture SQL.
+
+## Performance extension: sequential vs multiprocessing TF-IDF
+
+For a controlled comparison of local sequential execution against multiple OS processes on the same Codespace:
+
+```bash
+python benchmark.py --documents 100 1000 5000 --workers 2 4 --trials 3
+python -m unittest tests.test_benchmark -v
+```
+
+This produces a `results.csv` file with per-configuration median runtime, measured speedup and parallel efficiency. See [PERFORMANCE_ASSIGNMENT.md](PERFORMANCE_ASSIGNMENT.md).
+
+The implementation parallelizes **document tokenization and local term counting**, but deliberately merges **global document frequencies and TF-IDF scores centrally**. That bottleneck is part of the teaching goal. The processes run on **one machine**; this is not a Hadoop/Spark cluster, a network-shuffle benchmark or an assertion that multiprocessing always improves performance. Corpus generation is excluded from measurements, while process start-up and IPC are included. Results are checked for numerical agreement and identical document frequencies before comparison.
