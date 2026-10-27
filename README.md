@@ -34,3 +34,7 @@ Create `labs/07-topic-name/` with a README, exercise files and any necessary SQL
 ## Access and safety
 
 The sample passwords and configurations are for local classroom simulations only. Codespaces quotas and availability depend on each student's account. **Instructor solution files currently reside under each lab's `instructor/` directory; those directories are NOT access-controlled. Anyone who can read the repository can also read those solutions, including from Git history. Do not grant students repository access until solutions are relocated to an instructor-only repository and access is reviewed.**
+
+## One-command student initialization
+
+From the **repository root**, run `make lab-sql` for Lab 01, or `make lab-partitions`, `make lab-dwh`, `make lab-mapreduce`, `make lab-pagerank`, `make lab-tfidf` for the remaining labs. Use `make help` for the full menu. The initializer starts required services, creates missing database tables and runs a readiness check or Python demo. When tables already exist, it deliberately preserves them rather than reinitializing an assignment. For a deliberate reset use the separately confirmed `make reset LAB=...` command, then initialize again. See [Getting Started](docs/GETTING_STARTED.md).
