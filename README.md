@@ -1,58 +1,36 @@
-# Data Engineering Course — PostgreSQL Labs
+# Data Engineering Course — Hands-on Labs
 
-A modular hands-on PostgreSQL teaching repository for GitHub Codespaces. Each lab has a **self-contained README and exercises**; database-based labs have separate Docker Compose setups, while algorithm labs run directly in Python. No Docker installation on students' laptops is required.
+Browser-based teaching labs built for GitHub Codespaces. Each module contains its own instructions and student exercises. Python labs need no database; SQL labs use isolated PostgreSQL 16 containers.
 
-## Course labs
+## Start here
 
-| Order | Module | Focus | Launch |
-|---|---|---|---|
-| 01 | [Relational SQL & Query Optimization](labs/01-relational-sql/README.md) | JOIN, GROUP BY, NULL, nested queries, ranking, analytical window functions — 15 exercises | `cd labs/01-relational-sql` |
-| 02 | [Partitioning & Replication](labs/02-partitioning-replication/README.md) | ETL, partition pruning, PostgreSQL physical read replica, window functions | `cd labs/02-partitioning-replication` |
-| 03 | [Data Warehouse & ETL](labs/03-dwh-etl/README.md) | Raw vs staging, STTM, star schema, dimensional ETL, quality checks, idempotency | `cd labs/03-dwh-etl` |
-| 04 | [MapReduce](labs/04-mapreduce/README.md) | Map, shuffle, reduce, safe combiners, skew, distributed mean/variance | `cd labs/04-mapreduce` |
-| 05 | [PageRank](labs/05-pagerank/README.md) | Directed graphs, iterative PageRank, damping, dangling nodes, MapReduce iterations | `cd labs/05-pagerank` |
-| 06 | [Regex & TF-IDF](labs/06-tfidf/README.md) | Regex, tokenization, four MapReduce stages, TF-IDF and PostgreSQL SQL | `cd labs/06-tfidf` |
-
-## Student quick start
-
-Start with the [getting started guide](docs/GETTING_STARTED.md). From the repository root run:
+Read the [student quick-start guide](docs/GETTING_STARTED.md). From the repository root:
 
 ```bash
 make help
-make health LAB=04-mapreduce
-make demo LAB=04-mapreduce
+make health LAB=01-relational-sql
+make setup LAB=01-relational-sql
 ```
 
-Commands use a unified interface; setup may reset training data and should not be repeated after doing your assignment.
+**Warning:** Setup can recreate exercise tables and overwrite database work. Save answers first.
 
-## Open in Codespaces
+## Labs
 
-Choose **Code → Codespaces → Create codespace on main**. The devcontainer is shared by the course; each lab's Docker services are started only when needed.
+| Lab | Topic | Student instructions |
+|---|---|---|
+| 01 | SQL, JOINs, windows, query optimization | [Lab 01](labs/01-relational-sql/README.md) |
+| 02 | Partitioning, physical replication, windows | [Lab 02](labs/02-partitioning-replication/README.md) |
+| 03 | ETL, staging, dimensions and facts | [Lab 03](labs/03-dwh-etl/README.md) |
+| 04 | MapReduce and combiners | [Lab 04](labs/04-mapreduce/README.md) |
+| 05 | PageRank and performance | [Lab 05](labs/05-pagerank/README.md) |
+| 06 | Regex, TF-IDF and performance | [Lab 06](labs/06-tfidf/README.md) |
 
-Run one lab at a time to save Codespaces resources:
+Each module has its own README. Use `make demo LAB=...`, `make test LAB=...`, and `make benchmark LAB=...` where supported. Labs 04–06 have student tests that intentionally fail before solutions are implemented.
 
-```bash
-cd labs/01-relational-sql
-docker compose up -d
-docker compose exec -T postgres psql -U student -d query_lab < sql/01_schema.sql
-docker compose exec -T postgres psql -U student -d query_lab < sql/02_seed.sql
-```
+## Adding future modules
 
-Switch to the next lab from the repo root:
+Create `labs/07-topic-name/` with a README, exercise files and any necessary SQL, data, tests or scripts. Keep reusable course tooling at repository root. Avoid storing real personal data or production credentials.
 
-```bash
-cd /workspaces/postgres-data-engineering-lab/labs/02-partitioning-replication
-docker compose up -d
-docker compose exec -T primary psql -U lab -d engineering < sql/01_schema.sql
-python scripts/generate_sales.py --rows 200000
-```
+## Access and safety
 
-The PostgreSQL labs are isolated. Lab 01 uses localhost port **55432**, while lab 02 uses **5432** and **5433**. Only demo/test credentials are present; **never use this setup in production**.
-
-## Adding future labs
-
-Create `labs/07-topic-name/` with its own README, docker-compose.yml, sql/, optional scripts/ and assignments/. Keep common Codespaces configuration at the repository root. Do not commit personal data or production secrets.
-
-## For instructors
-
-Student exercise templates are provided inside each lab. Instructor-only solutions should remain **outside any repository accessible to students**. See each lab's student brief. Docker must be available inside the Codespace; if it launches in recovery mode, inspect Codespaces creation logs.
+The sample passwords and configurations are for local classroom simulations only. Codespaces quotas and availability depend on each student's account. **Instructor solution files currently reside under each lab's `instructor/` directory; those directories are NOT access-controlled. Anyone who can read the repository can also read those solutions, including from Git history. Do not grant students repository access until solutions are relocated to an instructor-only repository and access is reviewed.**
