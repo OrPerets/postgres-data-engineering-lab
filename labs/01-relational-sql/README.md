@@ -43,3 +43,14 @@ For a full volume reset (**deletes lab data**): `docker compose down -v`.
 ## Instructor note
 
 The original exercise's Q7 asks students to predict the query behavior on 'supplied data'; here the nullable city and returned-order rows are intentionally present to demonstrate NOT IN/NULL pitfalls. Q15 includes two completed orders on 2026-02-05 to demonstrate the difference between ROWS and RANGE. The source PDF does not contain a full reference dataset, so expected result counts can differ from a separate instructor dataset.
+
+## Window function performance demonstration
+
+Try the [running-total benchmark](benchmarks/README.md): an unindexed correlated subquery vs a `SUM() OVER` running total with equal results, `EXPLAIN (ANALYZE, BUFFERS)` comparisons, and an optional index challenge.
+
+```bash
+docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U student -d query_lab < benchmarks/01_seed_running_total.sql
+docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U student -d query_lab < benchmarks/02_compare.sql
+```
+
+This is a deliberately favorable example for window functions, not a universal speed guarantee. Execution times must be measured in your Codespace.
