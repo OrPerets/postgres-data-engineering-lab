@@ -9,6 +9,7 @@ A modular hands-on PostgreSQL teaching repository for GitHub Codespaces. Each la
 | 01 | [Relational SQL & Query Optimization](labs/01-relational-sql/README.md) | JOIN, GROUP BY, NULL, nested queries, ranking, analytical window functions — 15 exercises | `cd labs/01-relational-sql` |
 | 02 | [Partitioning & Replication](labs/02-partitioning-replication/README.md) | ETL, partition pruning, PostgreSQL physical read replica, window functions | `cd labs/02-partitioning-replication` |
 | 03 | [Data Warehouse & ETL](labs/03-dwh-etl/README.md) | Raw vs staging, STTM, star schema, dimensional ETL, quality checks, idempotency | `cd labs/03-dwh-etl` |
+| 04 | [MapReduce](labs/04-mapreduce/README.md) | Map, shuffle, reduce, safe combiners, skew, distributed mean/variance | `cd labs/04-mapreduce` |
 
 ## Open in Codespaces
 
