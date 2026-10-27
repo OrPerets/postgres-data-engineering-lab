@@ -1,91 +1,42 @@
-# PostgreSQL Data Engineering Lab — Partitions & Replicas
+# Data Engineering Course — PostgreSQL Labs
 
-A browser-based undergraduate data-engineering lab: **PostgreSQL 16, ETL loading, yearly partitions, and physical streaming replication**. Students can use **GitHub Codespaces**; no local Docker installation is required.
+A modular hands-on PostgreSQL teaching repository for GitHub Codespaces. Each lab has its **own database, Docker Compose file, SQL scripts and README**. No Docker installation on students' laptops is required.
 
-> **Classroom demo only:** Credentials are hard-coded, and replication access is deliberately permissive inside the container network. Do not deploy as a public or production database. Compose binds ports to loopback.
+## Course labs
 
-## Launch with Codespaces
+| Order | Module | Focus | Launch |
+|---|---|---|---|
+| 01 | [Relational SQL & Query Optimization](labs/01-relational-sql/README.md) | JOIN, GROUP BY, NULL, nested queries, ranking, analytical window functions — 15 exercises | `cd labs/01-relational-sql` |
+| 02 | [Partitioning & Replication](labs/02-partitioning-replication/README.md) | ETL, partition pruning, PostgreSQL physical read replica, window functions | `cd labs/02-partitioning-replication` |
 
-1. Open the repository on GitHub and choose **Code → Codespaces → Create codespace on main**. Ensure you have Codespaces access (private repository permissions and available quota).
-2. In the browser terminal run:
+## Open in Codespaces
+
+Choose **Code → Codespaces → Create codespace on main**. The devcontainer is shared by the course; each lab's Docker services are started only when needed.
+
+Run one lab at a time to save Codespaces resources:
 
 ```bash
+cd labs/01-relational-sql
 docker compose up -d
-docker compose ps
+docker compose exec -T postgres psql -U student -d query_lab < sql/01_schema.sql
+docker compose exec -T postgres psql -U student -d query_lab < sql/02_seed.sql
 ```
 
-3. Initialize and load data:
+Switch to the next lab from the repo root:
 
 ```bash
+cd /workspaces/postgres-data-engineering-lab/labs/02-partitioning-replication
+docker compose up -d
 docker compose exec -T primary psql -U lab -d engineering < sql/01_schema.sql
 python scripts/generate_sales.py --rows 200000
-python scripts/benchmark.py
-docker compose exec -T primary psql -U lab -d engineering < sql/02_partition_experiments.sql
 ```
 
-The devcontainer installs Python and a Docker-in-Docker feature; Python dependencies install on creation. If using a local terminal instead of Codespaces, install Docker Engine/Compose and Python 3.10+, then `pip install -r requirements.txt`.
+The two labs are isolated. Lab 01 uses localhost port **55432**, while lab 02 uses **5432** and **5433**. Only demo/test credentials are present; **never use this setup in production**.
 
-## Replication experiments
+## Adding future labs
 
-```bash
-docker compose exec primary psql -U lab -d engineering -c "SELECT pg_is_in_recovery();"
-docker compose exec replica psql -U lab -d engineering -c "SELECT pg_is_in_recovery();"
-docker compose exec primary psql -U lab -d engineering -c "SELECT application_name,state,sync_state FROM pg_stat_replication;"
-docker compose exec primary psql -U lab -d engineering -c "INSERT INTO sales_regular VALUES (99999999,'2026-10-26',100,500);"
-docker compose exec replica psql -U lab -d engineering -c "SELECT * FROM sales_regular WHERE sale_id=99999999;"
-```
+Create `labs/03-topic-name/` with its own README, docker-compose.yml, sql/, optional scripts/ and assignments/. Keep common Codespaces configuration at the repository root. Do not commit personal data or production secrets.
 
-Physical streaming replication is **asynchronous by default**; a fresh row may not be visible instantly. Try an INSERT on the replica; it should fail because the standby is read-only. Observe lag and catch-up by stopping and restarting the replica:
+## For instructors
 
-```bash
-docker compose stop replica
-docker compose start replica
-```
-
-For a full reset (**deletes all lab data**): `docker compose down -v && docker compose up -d`.
-
-## Files
-
-- `docker-compose.yml`: Primary and read-only replica.
-- `.devcontainer/devcontainer.json`: browser Codespaces development environment.
-- `docker/`: standby initialization with `pg_basebackup`.
-- `sql/`: schema, partition-pruning queries, replication checks.
-- `scripts/`: synthetic ETL load and benchmark.
-- `assignments/`: student brief and Hebrew instructor guide.
-
-## Learning questions
-
-- Why can partition pruning help only when relevant partition keys are filtered?
-- What happens when an index competes with partitioning?
-- Why does a read replica help reporting isolation but not increase primary write capacity?
-- Why is a replica **not a backup**? What is missing for automatic failover?
-
-## Troubleshooting
-
-- `docker compose ps` should show healthy Primary and Replica (first startup may take longer).
-- `docker compose logs primary replica` helps diagnose replication.
-- A volume from an older setup may prevent re-running init scripts; reset only if disposable.
-- On small data, partitioned queries may not be faster; compare EXPLAIN buffers and repeated timings.
-- In Codespaces, Docker-in-Docker can take a moment to initialize. If needed, rebuild the devcontainer.
-
-PostgreSQL references: [partitioning](https://www.postgresql.org/docs/16/ddl-partitioning.html), [warm standby](https://www.postgresql.org/docs/16/warm-standby.html), [pg_basebackup](https://www.postgresql.org/docs/16/app-pgbasebackup.html).
-
-## Extended assignment: write your own SQL
-
-The new assignment adds **monthly partitions, primary/replica diagnostics, and 7 window-function exercises** (running totals, ranking, LAG, moving averages, ties, and a combined pruning/window query).
-
-- [Student assignment V2](assignments/STUDENT_ASSIGNMENT_V2.md)
-- [Student blank SQL worksheet](sql/student_exercises.sql)
-- [Instructor notes (Hebrew, no answer key)](assignments/INSTRUCTOR_NOTES_V2_HE.md)
-
-After the initial load, optionally run:
-
-```bash
-docker compose exec -T primary psql -U lab -d engineering < sql/04_lab_extensions.sql
-```
-
-The original assignment remains available. Do **not** run `sql/student_exercises.sql` before completing the exercises; it is intentionally a blank student template. Students should run DDL only on Primary and use Replica for read-only tests.
-
-## Pre-DWH SQL practice (relational query optimization)
-
-Before the DWH, partitions and replicas lab, students can complete the independent [Relational SQL Practice](query-optimization-lab/README.md) using its own PostgreSQL container, seeded customers/orders/order_items tables, and 15 SQL exercises from the instructor's PDF. Start with `cd query-optimization-lab` and follow its README. This environment uses port 55432 and does not interfere with the main lab.
+Student exercise templates are provided inside each lab. Instructor-only solutions should remain **outside any repository accessible to students**. See each lab's student brief. Docker must be available inside the Codespace; if it launches in recovery mode, inspect Codespaces creation logs.
