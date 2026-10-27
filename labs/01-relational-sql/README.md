@@ -4,10 +4,10 @@ This lab reproduces the **schema, constraints, calculation rules and 15 exercise
 
 ## Open in Codespaces (no installation on your laptop)
 
-Open the parent repository in **GitHub Codespaces**. Docker must be available (`docker --version`). Then:
+Open the course repository in **GitHub Codespaces**. From the repository root: Docker must be available (`docker --version`). Then:
 
 ```bash
-cd query-optimization-lab
+cd labs/01-relational-sql
 docker compose up -d
 docker compose exec -T postgres psql -U student -d query_lab < sql/01_schema.sql
 docker compose exec -T postgres psql -U student -d query_lab < sql/02_seed.sql
