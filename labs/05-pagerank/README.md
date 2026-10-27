@@ -33,3 +33,17 @@ Four-page first damped iteration: A=.303125, B=.196875, C=.409375, D=.090625, an
 This is a **deterministic single-process logical simulator**, not a distributed Hadoop implementation. Do not claim physical parallelism, network shuffle, recovery, or distributed benchmark results.
 
 See [student assignment](STUDENT_ASSIGNMENT.md) and [student template](student_tasks.py).
+
+## Performance extension: sequential vs multi-process PageRank
+
+Run a controlled timing experiment after finishing the PageRank exercises:
+
+```bash
+python benchmark.py --nodes 1000 10000 --workers 2 4 --iterations 12 --trials 3
+python -m unittest tests.test_benchmark -v
+```
+
+Output is written to `results.csv` (do not commit benchmark results without contextual hardware metadata). Interpret measured **runtime, speedup and parallel efficiency** using the [performance assignment](PERFORMANCE_ASSIGNMENT.md).
+
+**Terminology:** This version performs real parallel map work in separate OS processes, but on **one host**. It is not a distributed cluster: no network shuffle, storage distribution, or fault-tolerant runtime. The work submitted to child processes is serialized on each iteration, and rank aggregation remains centralized; small graphs can be substantially slower with multiprocessing. The comparison uses an equal number of PageRank iterations, identical graph topology/damping, and verifies output agreement.
+
