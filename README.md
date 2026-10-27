@@ -85,3 +85,7 @@ docker compose exec -T primary psql -U lab -d engineering < sql/04_lab_extension
 ```
 
 The original assignment remains available. Do **not** run `sql/student_exercises.sql` before completing the exercises; it is intentionally a blank student template. Students should run DDL only on Primary and use Replica for read-only tests.
+
+## Pre-DWH SQL practice (relational query optimization)
+
+Before the DWH, partitions and replicas lab, students can complete the independent [Relational SQL Practice](query-optimization-lab/README.md) using its own PostgreSQL container, seeded customers/orders/order_items tables, and 15 SQL exercises from the instructor's PDF. Start with `cd query-optimization-lab` and follow its README. This environment uses port 55432 and does not interfere with the main lab.
