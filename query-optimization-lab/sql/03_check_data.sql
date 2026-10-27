@@ -1,5 +1,4 @@
--- Sanity checks: should return 15 customers, 34 orders, and 39 completed orders? 
--- Verify these counts from the data instead of assuming them.
+-- Sanity checks: dataset contains 15 customers and 34 orders.\n-- Verify counts and status distribution directly.
 SELECT 'customers' AS relation, count(*) AS records FROM customers
 UNION ALL SELECT 'orders', count(*) FROM orders
 UNION ALL SELECT 'order_items', count(*) FROM order_items;
