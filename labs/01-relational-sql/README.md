@@ -50,7 +50,9 @@ Try the [running-total benchmark](benchmarks/README.md): an unindexed correlated
 
 ```bash
 docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U student -d query_lab < benchmarks/01_seed_running_total.sql
-docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U student -d query_lab < benchmarks/02_compare.sql
+docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U student -d query_lab < benchmarks/03_compact_report.sql
 ```
 
 This is a deliberately favorable example for window functions, not a universal speed guarantee. Execution times must be measured in your Codespace.
+
+For a detailed plan and equality validation, run `benchmarks/02_compare.sql` separately. The default compact report is `benchmarks/03_compact_report.sql`.
