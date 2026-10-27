@@ -69,3 +69,19 @@ For a full reset (**deletes all lab data**): `docker compose down -v && docker c
 - In Codespaces, Docker-in-Docker can take a moment to initialize. If needed, rebuild the devcontainer.
 
 PostgreSQL references: [partitioning](https://www.postgresql.org/docs/16/ddl-partitioning.html), [warm standby](https://www.postgresql.org/docs/16/warm-standby.html), [pg_basebackup](https://www.postgresql.org/docs/16/app-pgbasebackup.html).
+
+## Extended assignment: write your own SQL
+
+The new assignment adds **monthly partitions, primary/replica diagnostics, and 7 window-function exercises** (running totals, ranking, LAG, moving averages, ties, and a combined pruning/window query).
+
+- [Student assignment V2](assignments/STUDENT_ASSIGNMENT_V2.md)
+- [Student blank SQL worksheet](sql/student_exercises.sql)
+- [Instructor notes (Hebrew, no answer key)](assignments/INSTRUCTOR_NOTES_V2_HE.md)
+
+After the initial load, optionally run:
+
+```bash
+docker compose exec -T primary psql -U lab -d engineering < sql/04_lab_extensions.sql
+```
+
+The original assignment remains available. Do **not** run `sql/student_exercises.sql` before completing the exercises; it is intentionally a blank student template. Students should run DDL only on Primary and use Replica for read-only tests.
