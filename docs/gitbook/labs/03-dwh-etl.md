@@ -71,3 +71,35 @@ Explain:
 - Why missing source coverage cannot be interpreted as zero usage.
 
 **Next:** [Lab 04 — MapReduce](04-mapreduce.md).
+
+
+## Visual checkpoint — One observation across the layers
+
+```mermaid
+flowchart TD
+    SF[Snowflake raw] --> SC[Snowflake clean view]
+    DK[Dataiku raw] --> DC[Dataiku clean view]
+    SC --> U[STAGE usage: UNION ALL]
+    DC --> U
+    U --> DIM[Load dimension keys]
+    DIM --> FACT[DWH fact_usage]
+    FACT --> REPORT[Reporting query]
+```
+
+### Expected counts for the provided teaching sample
+
+| Stage | Snowflake | Dataiku | Total |
+|---|---:|---:|---:|
+| Raw source rows | 5 | 5 | 10 |
+| Unified staging rows | 5 | 5 | 10 |
+| Fact rows after initial load | 5 | 5 | 10 |
+
+These are expected **sample observation counts**, not proof that the real source systems are complete. On an untouched database, the seed and DWH scripts are designed to preserve one fact per sample observation.
+
+### Investigate the missing value
+
+Use `batch_id = 'dk-sample-v1'` and `row_no = 4`. The supplied record has missing cost and token fields.
+
+**Checkpoint:** Query `STAGE_SCHEMA.usage` and `DWH_SCHEMA.fact_usage` for that record. Does missing cost remain `NULL` rather than becoming zero?
+
+**Think further:** A STAGE view reflects updated source values on future reads, while a previously loaded fact does not automatically update.
