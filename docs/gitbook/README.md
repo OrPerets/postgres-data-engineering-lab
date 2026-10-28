@@ -1,29 +1,50 @@
-# Data Engineering — Hands-on Course
+# Data Engineering
 
-Welcome! This guide walks you through practical data engineering: relational SQL, partitioning and replication, data warehousing and ETL, MapReduce, PageRank and TF-IDF.
+**HANDS-ON LABORATORY COURSE**
 
-**No installation on your laptop is required** when you use GitHub Codespaces. You'll read instructions here and run your code in the browser.
+*From relational databases to distributed data processing.*
 
-## How the course works
+A practical learning environment built around PostgreSQL, Python and real engineering trade-offs. Work through short experiments, write your own code, validate results and explore how data systems behave.
 
-1. Open a tutorial and read the **Goal**.
-2. Predict the expected result before running code.
-3. Open the linked GitHub repository in Codespaces.
-4. Run one initialization command from the repository root.
-5. Complete the tasks in your own SQL or Python file.
-6. Run checks, explain what you observed, and submit according to your instructor's directions.
+[**Start learning — Setup & Codespaces**](getting-started.md) · [**How the labs work**](how-to-learn.md)
 
-> **Before distributing repository access:** This code repository currently contains instructor answer files. Your instructor must review access and separate those solutions first.
+---
 
-## Your learning path
+## Explore the course
 
-| Lab | Topic | Main skill |
+| Lab | Subject | Your mission |
 |---|---|---|
-| [01](labs/01-relational-sql.md) | Relational SQL | Write correct queries and understand execution plans |
-| [02](labs/02-partitions-replicas.md) | Partitions & Replicas | Scale analytical reads and reason about storage |
-| [03](labs/03-dwh-etl.md) | Data Warehouse & ETL | Build and validate source-to-fact transformations |
-| [04](labs/04-mapreduce.md) | MapReduce | Understand map, shuffle, reduce and safe combiners |
-| [05](labs/05-pagerank.md) | PageRank | Implement iterative graph computation |
-| [06](labs/06-tfidf.md) | TF-IDF | Turn unstructured text into measurable features |
+| **01** | [Relational SQL & Query Optimization](labs/01-relational-sql.md) | Write reliable SQL and interpret execution plans |
+| **02** | [Partitioning & Replication](labs/02-partitions-replicas.md) | Scale storage and separate analytical reads |
+| **03** | [Data Warehouse & ETL](labs/03-dwh-etl.md) | Transform raw data into trusted analytical facts |
+| **04** | [MapReduce](labs/04-mapreduce.md) | Break computations into Map, Shuffle and Reduce |
+| **05** | [PageRank](labs/05-pagerank.md) | Understand rank propagation across graph edges |
+| **06** | [Regex & TF-IDF](labs/06-tfidf.md) | Turn messy text into structured numerical features |
 
-Start with [Setup and Codespaces](getting-started.md). If something fails, open [Troubleshooting](troubleshooting.md).
+## One workflow, six labs
+
+**UNDERSTAND → PREDICT → IMPLEMENT → VALIDATE → EXPLAIN**
+
+Each lab opens with a concrete question, continues with a small worked example and ends with a coding exercise and validation.
+
+### Launch your first lab
+
+Open the GitHub course repository in Codespaces and, from its root, run:
+
+```bash
+make lab-sql
+```
+
+The starter brings up PostgreSQL and initializes the sample dataset if it has not already been prepared.
+
+[Open the course repository](https://github.com/OrPerets/postgres-data-engineering-lab)
+
+---
+
+## Need help?
+
+Use [Troubleshooting](troubleshooting.md) for Docker, Codespaces and SQL issues, or review the [Glossary](glossary.md) for terminology.
+
+**Course documentation** — Shenkar-inspired academic styling. The site is a teaching resource; institutional logo usage and formal publication status should be approved separately.
+
+> **Instructor access notice:** The current code repository contains instructor solutions. Do not grant students access to the repository until instructor materials and Git history are separated appropriately.
