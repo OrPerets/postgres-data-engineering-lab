@@ -67,3 +67,37 @@ Why do hot keys create skew? What communication does Shuffle represent? Which co
 This exercise is a **single-process logical simulator**, not a real multi-machine Hadoop deployment.
 
 **Next:** [Lab 05 — PageRank](05-pagerank.md).
+
+
+## Visual walkthrough — Follow the keys
+
+```mermaid
+flowchart LR
+  IN["Input: ABR / CCR / ACB"] --> MAP["Map: emit (letter, 1)"]
+  MAP --> SHUF["Shuffle: group by letter"]
+  SHUF --> RED["Reduce: sum each group"]
+  RED --> OUT["Output: A=2, B=2, C=3, R=2"]
+```
+
+### Trace table
+
+| Stage | Example for key C |
+|---|---|
+| Input | `CCR` and `ACB` contain C |
+| Map | `(C,1), (C,1), (C,1)` |
+| Shuffle | `C → [1, 1, 1]` |
+| Reduce | `C → 3` |
+
+**Pause and predict:** If the number of reducers changes from 1 to 3, should the final count of C change?
+
+### Combiner investigation
+
+Compare `shuffle_pairs` with and without a local combiner:
+
+```bash
+python mapreduce_demo.py
+```
+
+A combiner may reduce intermediate pairs but **must preserve the final result**. For mean, combine `(sum, count)` states instead of averaging partial averages.
+
+> The arrows represent logical movement. This exercise is not a real networked shuffle across Hadoop nodes.
