@@ -42,3 +42,7 @@ The sample passwords and configurations are for local classroom simulations only
 ## One-command student initialization
 
 From the **repository root**, run `make lab-sql` for Lab 01, or `make lab-partitions`, `make lab-dwh`, `make lab-mapreduce`, `make lab-pagerank`, `make lab-tfidf` for the remaining labs. Use `make help` for the full menu. The initializer starts required services, creates missing database tables and runs a readiness check or Python demo. When tables already exist, it deliberately preserves them rather than reinitializing an assignment. For a deliberate reset use the separately confirmed `make reset LAB=...` command, then initialize again. See [Getting Started](docs/GETTING_STARTED.md).
+
+## Interactive simulator preview
+
+The browser-based [MapReduce + PageRank explorer](simulators/README.md) is available for **private testing in Codespaces**. Launch with `python -m http.server 8000 --directory simulators` and open the forwarded **private** port. It has not been publicly deployed or embedded in GitBook.
