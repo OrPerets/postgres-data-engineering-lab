@@ -4,9 +4,9 @@
 
 *From relational databases to distributed data processing.*
 
-A practical learning environment built around PostgreSQL, Python and real engineering trade-offs. Work through short experiments, write your own code, validate results and explore how data systems behave.
+Explore data engineering through hands-on experiments with PostgreSQL, SQL, Python, Docker and GitHub Codespaces. Build ETL pipelines and investigate MapReduce, PageRank and TF-IDF while learning to predict, implement and validate your results.
 
-[**Start learning — Setup & Codespaces**](getting-started.md) · [**How the labs work**](how-to-learn.md)
+[**Start Learning**](getting-started.md) · [**Explore Labs**](#explore-the-course) · [**Open GitHub Repository**](https://github.com/OrPerets/postgres-data-engineering-lab) · [**Troubleshooting**](troubleshooting.md)
 
 ---
 
