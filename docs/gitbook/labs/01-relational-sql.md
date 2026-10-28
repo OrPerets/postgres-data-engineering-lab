@@ -1,49 +1,134 @@
 # Lab 01 — Relational SQL & Query Optimization
 
-**Goal:** Write correct SQL with joins, aggregates, subqueries and window functions, then understand why two equivalent queries can run at very different speeds.
+> **Your mission:** Turn customer orders into reliable business insights, and discover why two queries returning identical results can have very different execution costs.
 
-**You should know:** Basic `SELECT`, `WHERE`, `JOIN`, `GROUP BY`.
+**You will practice:** JOINs, aggregation, correlated subqueries, NULL handling, window functions and query plans.
 
-## Start
-From the repository root in Codespaces:
+**Environment:** PostgreSQL in GitHub Codespaces. No local Docker installation is required.
+
+## 1. Get ready
+
+Open the [course repository](https://github.com/OrPerets/postgres-data-engineering-lab) in Codespaces. In the terminal, **from the repository root**, run:
 
 ```bash
 make lab-sql
 ```
 
-This prepares synthetic `customers`, `orders` and `order_items` tables.
+When the initializer finishes, open the [student answer file](https://github.com/OrPerets/postgres-data-engineering-lab/blob/main/labs/01-relational-sql/sql/student_answers.sql). It contains all 15 questions with empty answer sections.
 
-[Open the Lab 01 code](https://github.com/OrPerets/postgres-data-engineering-lab/tree/main/labs/01-relational-sql) · [Student question sheet](https://github.com/OrPerets/postgres-data-engineering-lab/blob/main/labs/01-relational-sql/sql/student_answers.sql)
+### Checkpoint — Can you access the data?
 
-## First experiment — Revenue
-For a completed order, net line revenue is:
-
-```sql
-quantity * unit_price * (1 - COALESCE(discount_pct,0)/100.0)
+```bash
+cd labs/01-relational-sql
+docker compose exec postgres psql -U student -d query_lab
 ```
 
-**Predict:** Should a cancelled order count as revenue? What happens to an order with a 100% discount?
+Inside PostgreSQL:
 
-## Your tasks
-Complete the **15 questions written directly in** `labs/01-relational-sql/sql/student_answers.sql`. They cover outer joins, subquery logic, `NULL`, rankings, running totals and `ROWS` versus `RANGE`.
+```sql
+SELECT COUNT(*) FROM customers;
+SELECT * FROM orders LIMIT 5;
+```
 
-## Performance mini-lab — Two ways to calculate running totals
-The benchmark creates a separate `benchmark_sales` table and compares:
-- a correlated subquery that repeatedly scans preceding transactions;
-- `SUM(amount) OVER (PARTITION BY customer_id ORDER BY sale_date,sale_id ROWS UNBOUNDED PRECEDING)`.
+Exit with `\q`.
 
-Run from `labs/01-relational-sql`:
+**Expected:** SQL runs and returns records. If the service is unavailable, see [Troubleshooting](../troubleshooting.md).
+
+## 2. Understand the data
+
+You are analyzing three related tables:
+
+| Table | What one row represents |
+|---|---|
+| `customers` | One customer |
+| `orders` | One order, with date and status |
+| `order_items` | One product line inside an order |
+
+The lab uses **synthetic data** designed to expose common SQL mistakes.
+
+### Business rules
+
+- Count only `completed` orders in revenue unless the question says otherwise.
+- Exclude cancelled and returned orders from revenue; a returned order represents a full return.
+- A `NULL` discount means no discount.
+- Net revenue for one order line is:
+
+```sql
+quantity * unit_price * (1 - COALESCE(discount_pct, 0) / 100.0)
+```
+
+### Think before coding
+
+**Question:** Does a completed order with a 100% discount count as a completed order? Does it contribute revenue?
+
+Write your prediction, then test it with SQL.
+
+## 3. Complete the 15 SQL questions
+
+Open `labs/01-relational-sql/sql/student_answers.sql`. Write SQL beneath each numbered question.
+
+Work in this sequence:
+
+1. **Queries 1–5:** Filters, JOINs, grouping and business metrics.
+2. **Queries 6–7:** Debugging aggregation and `NOT IN` / `NULL` behavior.
+3. **Queries 8–11:** Ranking, previous values, running totals and monthly comparisons.
+4. **Queries 12–15:** More advanced relational logic, product pairs and window-frame semantics.
+
+### Checkpoint — Is the output actually correct?
+
+Before moving on, ask:
+
+- Does my JOIN accidentally multiply order counts?
+- Do customers with no orders still appear when required?
+- Does my calculation handle `NULL` correctly?
+- Is my `ORDER BY` deterministic when dates or amounts tie?
+
+**Hint:** When an order has several items, calculate *per-order* metrics at the order grain before joining them to per-customer summaries.
+
+## 4. Experiment — Why can a Window Function be faster?
+
+**Goal:** Calculate each customer's running total without recomputing all previous transactions.
+
+First predict which version will be faster: a correlated subquery or `SUM(...) OVER (...)`. Both should return the same answers.
+
+Run the benchmark setup:
 
 ```bash
 docker compose exec -T postgres psql -U student -d query_lab < benchmarks/01_seed_running_total.sql
+```
+
+Now run the **compact comparison**:
+
+```bash
 docker compose exec -T postgres psql -U student -d query_lab < benchmarks/03_compact_report.sql
 ```
 
-**Look for:** scan executions, aggregation executions, shared buffer hits, execution time and the **MATCH** correctness summary.
+You'll see:
 
-**Explain:** Why is an ordered window often more efficient here? Could adding an index change the result? This is a deliberately favorable case for window functions—not a universal performance guarantee.
+- Number of sequential scan executions.
+- Aggregate/Window and sort executions.
+- Shared buffer hits.
+- Total runtime for both approaches.
+- Side-by-side sample outputs and a full-data `MATCH` / `MISMATCH` check.
 
-[Read benchmark instructions](https://github.com/OrPerets/postgres-data-engineering-lab/blob/main/labs/01-relational-sql/benchmarks/README.md).
+### Understand the result
 
-## Before leaving
-Your SQL file should contain all requested answers, and you should be able to explain at least one execution plan and one correctness pitfall.
+The correlated subquery may repeatedly scan the table for each transaction. The window plan can sort and process the ordered rows with incremental running aggregation.
+
+**Important:** A Window Function is not always faster. This benchmark deliberately uses a case where repeated work is expensive. Indexes, table size and caching can change the result.
+
+### Optional challenge
+
+Read the [performance challenge](https://github.com/OrPerets/postgres-data-engineering-lab/blob/main/labs/01-relational-sql/benchmarks/STUDENT_CHALLENGE.md). Add a composite index and compare again.
+
+## 5. Reflect and finish
+
+Before leaving the lab, be ready to explain:
+
+1. Why a LEFT JOIN followed by a WHERE filter can accidentally remove customers without orders.
+2. Why `ROWS` and `RANGE` may produce different cumulative results when dates tie.
+3. Why your two running-total queries produce identical outputs but different execution plans.
+
+**Deliverable:** Your completed `student_answers.sql`, together with any explanation or benchmark evidence requested by your instructor.
+
+**Next:** [Lab 02 — Partitions & Replication](02-partitions-replicas.md).
