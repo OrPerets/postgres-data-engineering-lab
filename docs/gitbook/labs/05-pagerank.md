@@ -248,3 +248,13 @@ Try the [performance benchmark](https://github.com/OrPerets/postgres-data-engine
 - Did your convergence check use a consistent distance measure?
 
 **Finish:** Complete `student_tasks.py` and run `python -m unittest discover -s tests -v`.
+
+## Try the interactive simulator (preview)
+
+The [Algorithm Explorers browser app](https://github.com/OrPerets/postgres-data-engineering-lab/tree/main/simulators) is available for **private Codespaces testing**. From the repository root run:
+
+```bash
+python -m http.server 8000 --directory simulators
+```
+
+Open forwarded port **8000** in the Codespaces Ports panel (keep visibility **Private**). Select **PageRank**, change the input or parameters, and navigate one step at a time. The app is not yet deployed as a public website.
