@@ -1,32 +1,73 @@
 # Lab 03 — Data Warehouse & ETL
 
-**Goal:** Trace data from two heterogeneous source systems through staging views into warehouse dimensions and facts.
+> **Your mission:** Convert two incompatible source feeds into a reliable dimensional warehouse without silently inventing missing facts.
 
-## Start
+**You will practice:** Source-to-target mapping, staging, data quality, dimensional modeling, fact grain and repeatable loads.
+
+## 1. Get ready
+
+From the repository root in Codespaces:
+
 ```bash
 make lab-dwh
 ```
 
-[Open lab code](https://github.com/OrPerets/postgres-data-engineering-lab/tree/main/labs/03-dwh-etl) · [Assignment](https://github.com/OrPerets/postgres-data-engineering-lab/blob/main/labs/03-dwh-etl/STUDENT_ASSIGNMENT.md)
+[Open Lab 03](https://github.com/OrPerets/postgres-data-engineering-lab/tree/main/labs/03-dwh-etl) · [Full assignment](https://github.com/OrPerets/postgres-data-engineering-lab/blob/main/labs/03-dwh-etl/STUDENT_ASSIGNMENT.md)
 
-## The pipeline
-`SRC_SCHEMA.snowflake_raw` + `SRC_SCHEMA.dataiku_raw` → source-specific clean views → `STAGE_SCHEMA.usage` → dimensions → `DWH_SCHEMA.fact_usage`.
+### Checkpoint — Did the pipeline load?
 
-### Understand
-In SRC, timestamps and amounts arrive as text. In STAGE, queries cast and normalize them and attach data-quality flags. In DWH, source observations are stored as facts with foreign keys to dimensions.
+```bash
+cd labs/03-dwh-etl
+docker compose exec -T postgres psql -U student -d dwh_etl_lab < sql/03_verify.sql
+```
 
-> STAGE is built from **views**, not copied staging tables. Read the view to see transformed source data.
+**Expected with the supplied sample:** five Snowflake observations and five Dataiku observations; ten unified staging records. These are *sample rows*, not evidence of source completeness.
+
+## 2. Follow one record through three layers
+
+```text
+SRC (raw text)
+    ↓
+STAGE (typed views + quality flags)
+    ↓
+DWH (dimensions + fact_usage)
+```
+
+- **SRC:** Original fields and source-specific meanings.
+- **STAGE:** Standardized names and types, built as views; no physical copy.
+- **DWH:** Surrogate dimension keys and stored source-observation facts.
 
 ### Predict
-- What happens to an empty cost? Does it become zero?
-- Why is `UNION ALL` appropriate rather than `UNION`?
-- Why do dimensions need to be loaded before facts?
-- Does repeating `ON CONFLICT DO NOTHING` refresh modified source records?
 
-### Investigate
-Use the sample row `batch_id='dk-sample-v1'`, `row_no=4` and trace it through all layers. It has missing costs and tokens.
+What happens when an estimated cost is empty? Is it zero, missing, or invalid? Why must `source_code` be retained when comparing identities across systems?
 
-Write the SQL questions in `sql/student_exercises.sql`. The original sample has **five rows per source**, and it does **not** prove all business events were ingested.
+## 3. Inspect transformations
 
-### Extension
-Design an update-aware ingestion policy for corrected and deleted source observations, explaining how it differs from the sample's conflict-skipping load.
+Run queries against `STAGE_SCHEMA.snowflake_clean`, `STAGE_SCHEMA.dataiku_clean`, and `STAGE_SCHEMA.usage`.
+
+**Checkpoint:** Explain why `UNION ALL` preserves both feeds rather than joining or deduplicating them.
+
+**Hint:** `NULL` for cost means "unknown"; `0` means a known zero cost.
+
+## 4. Trace a fact row
+
+Find the sample with `batch_id='dk-sample-v1'` and `row_no=4`. Join `DWH_SCHEMA.fact_usage` to the user, source, model and entity dimensions.
+
+**Checkpoint:** Does its missing cost stay missing? Why is a source natural key different from a DWH surrogate key?
+
+## 5. Test the engineering behavior
+
+Rerun `sql/02_dwh.sql` **only after preserving any assignment changes**. Compare fact counts before and after.
+
+**Predict:** Does `ON CONFLICT DO NOTHING` prevent duplicate fixed-batch inserts? Will it propagate a correction made to a previously loaded source row?
+
+## 6. Complete and reflect
+
+Write the SQL in [student_exercises.sql](https://github.com/OrPerets/postgres-data-engineering-lab/blob/main/labs/03-dwh-etl/sql/student_exercises.sql) and the explanations from the [assignment](https://github.com/OrPerets/postgres-data-engineering-lab/blob/main/labs/03-dwh-etl/STUDENT_ASSIGNMENT.md).
+
+Explain:
+- The grain of a fact row.
+- Why dimension keys are resolved before fact loading.
+- Why missing source coverage cannot be interpreted as zero usage.
+
+**Next:** [Lab 04 — MapReduce](04-mapreduce.md).
