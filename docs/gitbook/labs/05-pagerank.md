@@ -71,3 +71,38 @@ Record measured times, speedup and efficiency. [Read the performance assignment]
 **Explain:** Why can two or four worker processes be *slower* on small graphs? How is a single Codespace different from a multi-node distributed cluster?
 
 **Next:** [Lab 06 — TF-IDF](06-tfidf.md).
+
+
+## Visual walkthrough — One rank update
+
+```mermaid
+flowchart LR
+  A["A: links to B,C"] --> B["B"]
+  A --> C["C"]
+  B --> C
+  C --> A
+  D["D: dangling"] --> MASS["Dangling mass"]
+  MASS --> ALL["Redistribute across A,B,C,D"]
+```
+
+### First iteration with damping 0.85
+
+Start with four pages at 0.25 each and links A→B,C; B→C; C→A; D→none.
+
+| Page | Incoming link contribution | New rank |
+|---|---:|---:|
+| A | 0.250 | 0.303125 |
+| B | 0.125 | 0.196875 |
+| C | 0.375 | 0.409375 |
+| D | 0 | 0.090625 |
+| **Total** | **0.750** | **1.000000** |
+
+The missing 0.25 link contribution is dangling mass from D. Teleportation and damped redistribution preserve the total rank.
+
+**Predict:** What would happen to the sum of ranks if the algorithm simply discarded D's rank?
+
+**Try it:** Run `python pagerank_demo.py` and compare the first iteration to this table. Then implement the functions in `student_tasks.py`.
+
+### Performance: what is and isn't measured
+
+The optional benchmark compares sequential PageRank with multi-process mapping on **one Codespace host**. It does not benchmark a real multi-node cluster. Explain process startup, communication overhead and centralized reduction before interpreting any speedup.
