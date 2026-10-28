@@ -213,3 +213,13 @@ TASK
 **Finish:** Implement the functions in `student_tasks.py` and run `python -m unittest discover -s tests -v`. Student tests initially fail until implementations are complete.
 
 **Remember:** This tutorial simulates MapReduce on one machine; it does not measure a real network shuffle.
+
+## Try the interactive simulator (preview)
+
+The [Algorithm Explorers browser app](https://github.com/OrPerets/postgres-data-engineering-lab/tree/main/simulators) is available for **private Codespaces testing**. From the repository root run:
+
+```bash
+python -m http.server 8000 --directory simulators
+```
+
+Open forwarded port **8000** in the Codespaces Ports panel (keep visibility **Private**). Select **MapReduce**, change the input or parameters, and navigate one step at a time. The app is not yet deployed as a public website.
