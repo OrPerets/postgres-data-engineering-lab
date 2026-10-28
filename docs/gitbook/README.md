@@ -12,14 +12,17 @@ Explore data engineering through hands-on experiments with PostgreSQL, SQL, Pyth
 
 ## Explore the course
 
-| Lab | Subject | Your mission |
-|---|---|---|
-| **01** | [Relational SQL & Query Optimization](labs/01-relational-sql.md) | Write reliable SQL and interpret execution plans |
-| **02** | [Partitioning & Replication](labs/02-partitions-replicas.md) | Scale storage and separate analytical reads |
-| **03** | [Data Warehouse & ETL](labs/03-dwh-etl.md) | Transform raw data into trusted analytical facts |
-| **04** | [MapReduce](labs/04-mapreduce.md) | Break computations into Map, Shuffle and Reduce |
-| **05** | [PageRank](labs/05-pagerank.md) | Understand rank propagation across graph edges |
-| **06** | [Regex & TF-IDF](labs/06-tfidf.md) | Turn messy text into structured numerical features |
+**Part I — Relational Data Engineering**
+
+1. [**Relational SQL & Query Optimization**](labs/01-relational-sql.md) — Write reliable SQL and interpret execution plans.
+2. [**Partitioning & Replication**](labs/02-partitions-replicas.md) — Scale storage and separate analytical reads.
+3. [**Data Warehouse & ETL**](labs/03-dwh-etl.md) — Transform raw data into trusted analytical facts.
+
+**Part II — Distributed Data Processing**
+
+4. [**MapReduce**](labs/04-mapreduce.md) — Break computations into Map, Shuffle and Reduce.
+5. [**PageRank**](labs/05-pagerank.md) — Understand rank propagation across graph edges.
+6. [**Regex & TF-IDF**](labs/06-tfidf.md) — Turn messy text into structured numerical features.
 
 ## One workflow, six labs
 
