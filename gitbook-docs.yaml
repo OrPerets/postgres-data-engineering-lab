@@ -1,0 +1,11 @@
+$schema: https://api.gitbook.com/gitbook-docs.yaml
+site:
+  title: Data Engineering — Hands-on Course
+  structure:
+    - type: space
+      key: data-engineering-course
+      title: Data Engineering — Student Tutorials
+      path: /
+      default: true
+      content:
+        directory: ./docs/gitbook
