@@ -2,6 +2,10 @@
 
 Browser-based teaching labs built for GitHub Codespaces. Each module contains its own instructions and student exercises. Python labs need no database; SQL labs use isolated PostgreSQL 16 containers.
 
+## Student-friendly GitBook tutorials
+
+Browse the [GitBook-ready course documentation](docs/gitbook/README.md) and [navigation](docs/gitbook/SUMMARY.md). Follow [GitBook connection instructions](docs/gitbook/CONNECT_GITBOOK.md) to create a docs site without exposing instructor materials. The site has not yet been published.
+
 ## Start here
 
 Read the [student quick-start guide](docs/GETTING_STARTED.md). From the repository root:
