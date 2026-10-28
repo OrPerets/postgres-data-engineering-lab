@@ -1,51 +1,82 @@
 # Lab 06 — Regex & TF-IDF
 
-**Goal:** Transform raw text into structured features, then compute term importance locally and through MapReduce-style aggregation.
+> **Your mission:** Turn messy tickets and short documents into searchable numerical features using Regex and four MapReduce-style stages.
 
-## Start
+**You will practice:** Field extraction, tokenization, term frequency, document frequency, TF-IDF and performance analysis.
+
+## 1. Get ready
+
+From the repository root:
+
 ```bash
 make lab-tfidf
 ```
 
-[Student code](https://github.com/OrPerets/postgres-data-engineering-lab/blob/main/labs/06-tfidf/student_tasks.py) · [Assignment](https://github.com/OrPerets/postgres-data-engineering-lab/blob/main/labs/06-tfidf/STUDENT_ASSIGNMENT.md)
+[Student code](https://github.com/OrPerets/postgres-data-engineering-lab/blob/main/labs/06-tfidf/student_tasks.py) · [Full assignment](https://github.com/OrPerets/postgres-data-engineering-lab/blob/main/labs/06-tfidf/STUDENT_ASSIGNMENT.md)
 
-## From messy text to tokens
-Given `Printer JAM!!! Ticket=TKT-1042`, extract the ticket identifier, normalize text and inspect tokens.
-
-**Predict:** Should `TKT-12` match a ticket ID requiring 4–6 digits?
-
-## Four computation stages
-1. Count `(term, document)` occurrences.
-2. Calculate document length and normalized term frequency.
-3. Count the distinct documents that contain each term.
-4. Compute TF-IDF.
-
-This lab uses **natural log** smoothing:
+## 2. Start with messy text
 
 ```text
-TF = term_count / document_length
-IDF = ln((N+1) / (df+1))
-TF-IDF = TF * IDF
+Printer JAM!!! Ticket=TKT-1042
+refund USD 120.50 requested
 ```
 
-The lecture also shows a base-2 log example, which gives different numerical scores. Do not mix conventions.
+**Predict:** Which ticket IDs are valid if the pattern requires 4–6 digits? Should `TKT-12` match?
 
-## Practice
-Complete the functions in `student_tasks.py`; run:
+## 3. Explore the transformation pipeline
+
+```text
+Raw text → Regex extraction → Normalize → Tokenize
+         → (term, document) counts → TF → DF/IDF → TF-IDF
+```
 
 ```bash
 cd labs/06-tfidf
+python tfidf_demo.py
+```
+
+**Checkpoint:** What happens to case, punctuation and duplicate terms in a document?
+
+## 4. Build the four computational stages
+
+1. Count occurrences by `(term, document)`.
+2. Calculate normalized term frequency from counts and document length.
+3. Calculate document frequency as the number of **distinct documents** containing a term.
+4. Multiply TF by IDF.
+
+This lab uses natural logarithm:
+
+```text
+TF = term_count / document_length
+IDF = ln((N+1)/(df+1))
+TF-IDF = TF * IDF
+```
+
+**Hint:** Counting how many times a term appears across the entire corpus is *not* document frequency.
+
+## 5. Implement, test and compare to SQL
+
+Complete `student_tasks.py`, then run:
+
+```bash
+python -m unittest tests.test_demo -v
 python -m unittest discover -s tests -v
 ```
 
-## SQL comparison
-Use PostgreSQL `sql/02_reference_query.sql` to calculate the same formula with `ln(...)`. Compare to Python.
+For the PostgreSQL equivalent, use the provided `sql/02_reference_query.sql` after the initialized database is ready.
 
-## Performance
-Try:
+**Checkpoint:** For `data` in document D1, TF=2/4, DF=3, N=4. Under the lab's natural-log convention, TF-IDF is approximately 0.1116.
+
+## 6. Optional performance challenge
 
 ```bash
 python benchmark.py --documents 100 1000 --workers 2 4 --trials 3
 ```
 
-Global document frequency remains centrally aggregated in the multi-process demo, illustrating a scaling bottleneck. [Performance assignment](https://github.com/OrPerets/postgres-data-engineering-lab/blob/main/labs/06-tfidf/PERFORMANCE_ASSIGNMENT.md).
+[Performance assignment](https://github.com/OrPerets/postgres-data-engineering-lab/blob/main/labs/06-tfidf/PERFORMANCE_ASSIGNMENT.md).
+
+**Explain:** Why must DF be combined globally? Why can multiprocessing overhead outweigh the benefit for a small corpus?
+
+The lecture also shows a base-2 logarithm convention, which produces different IDF numbers. Use one convention consistently.
+
+**Finish:** Submit your code, tests, SQL comparison and interpretation as requested by your instructor.
