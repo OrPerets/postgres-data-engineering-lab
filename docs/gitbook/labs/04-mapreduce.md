@@ -101,3 +101,115 @@ python mapreduce_demo.py
 A combiner may reduce intermediate pairs but **must preserve the final result**. For mean, combine `(sum, count)` states instead of averaging partial averages.
 
 > The arrows represent logical movement. This exercise is not a real networked shuffle across Hadoop nodes.
+
+## Guided exercise — Map → Shuffle → Reduce by hand
+
+**Before running the code:** Predict the output for these three input records:
+
+```text
+ABR
+CCR
+ACB
+```
+
+### Step 1: Map
+
+Write one `(letter, 1)` pair for every character. Repeated letters must create repeated pairs.
+
+| Input | Mapper output — fill in |
+|---|---|
+| ABR | ? |
+| CCR | ? |
+| ACB | ? |
+
+### Step 2: Shuffle
+
+Group the intermediate values by their key. Complete this table without executing Python:
+
+| Key | Grouped values |
+|---|---|
+| A | ? |
+| B | ? |
+| C | ? |
+| R | ? |
+
+### Step 3: Reduce
+
+For every key, sum its grouped values. Compare your prediction with the program:
+
+```bash
+cd labs/04-mapreduce
+python mapreduce_demo.py
+```
+
+<details>
+<summary>Reveal the expected intermediate results</summary>
+
+| Input | Map output |
+|---|---|
+| ABR | (A,1), (B,1), (R,1) |
+| CCR | (C,1), (C,1), (R,1) |
+| ACB | (A,1), (C,1), (B,1) |
+
+| Key | Shuffled values | Reduced result |
+|---|---|---:|
+| A | [1, 1] | 2 |
+| B | [1, 1] | 2 |
+| C | [1, 1, 1] | 3 |
+| R | [1, 1] | 2 |
+
+</details>
+
+### Checkpoint: Number of reducers
+
+Try 1, 2 and 3 reducers using `run_char_count` in `mapreduce_demo.py`. **Predict:** Does changing the number of reducers affect the final counts, or only the grouping workload?
+
+<details>
+<summary>Reveal the conceptual answer</summary>
+
+All occurrences of a key must be assigned to the same reducer. Correct partitioning changes where work is performed, but not the final counts.
+
+</details>
+
+## Combiner investigation — Saving work safely
+
+Run the demonstration with and without local combination. Compare `mapper_outputs` and `shuffle_pairs`.
+
+- **A combiner is safe for sums:** `(C,1), (C,1), (C,1)` can become `(C,3)`.
+- **Naively averaging worker averages is unsafe:** unequal group sizes get incorrect weights.
+- **A safe distributed mean uses a mergeable state:** `(sum, count)`.
+
+**Try this:** Worker 1 sees `[1]`; worker 2 sees `[3,5,7]`. Compute the average of the two local means, then the mean of all four numbers. Are they equal?
+
+<details>
+<summary>Reveal a hint and check your reasoning</summary>
+
+Worker means are 1 and 5, so their unweighted mean is 3. All four observations have mean 4. Preserve `(sum, count)` instead.
+
+</details>
+
+## Mini challenge — Your own MapReduce input
+
+Use three new records:
+
+```text
+DATA
+DARK
+TASK
+```
+
+1. Hand-calculate map outputs, shuffle groups and final counts.
+2. Explain how a hot key could overload one reducer.
+3. Describe when local combination reduces intermediate data and when it cannot.
+4. Change the records in a **copy** of the demo and verify your answer.
+
+## If your result is wrong
+
+- Did you emit one pair per **character**, including duplicates?
+- Did you group pairs by the emitted key?
+- Did you count occurrences rather than number of input lines?
+- Did your combiner preserve enough information to produce the correct final aggregate?
+
+**Finish:** Implement the functions in `student_tasks.py` and run `python -m unittest discover -s tests -v`. Student tests initially fail until implementations are complete.
+
+**Remember:** This tutorial simulates MapReduce on one machine; it does not measure a real network shuffle.
