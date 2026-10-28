@@ -1,42 +1,76 @@
-# Lab 02 — PostgreSQL Partitions & Replicas
+# Lab 02 — Partitioning & Replication
 
-**Goal:** Understand the difference between *how data is stored* (table partitioning) and *where analytical queries run* (read replicas).
+> **Your mission:** Keep analytical queries efficient as sales data grows, while separating reporting workloads from ETL writes.
 
-## Start
+**You will practice:** RANGE partitions, partition pruning, physical PostgreSQL replication, replication lag, and analytical Window Functions.
+
+## 1. Get ready
+
+In GitHub Codespaces, **from the repository root**:
+
 ```bash
 make lab-partitions
 ```
 
-This starts PostgreSQL Primary and a physical streaming Replica, creates sales tables and loads synthetic data.
+The initializer starts a Primary and a Read Replica, creates the sales tables, and prepares synthetic data. It preserves existing tables when already initialized.
 
-[Open code and exercises](https://github.com/OrPerets/postgres-data-engineering-lab/tree/main/labs/02-partitioning-replication) · [Full student assignment](https://github.com/OrPerets/postgres-data-engineering-lab/blob/main/labs/02-partitioning-replication/assignments/STUDENT_ASSIGNMENT.md)
+[Open lab files](https://github.com/OrPerets/postgres-data-engineering-lab/tree/main/labs/02-partitioning-replication) · [Complete student assignment](https://github.com/OrPerets/postgres-data-engineering-lab/blob/main/labs/02-partitioning-replication/assignments/STUDENT_ASSIGNMENT.md)
 
-## Part A — Partition pruning
-Compare regular and yearly-partitioned `sales` tables.
+### Checkpoint — Both servers ready?
 
-**Predict:** If a query filters January–March 2025, which yearly partitions must be visited?
-
-Run an `EXPLAIN (ANALYZE, BUFFERS)` comparison. Explain scanned relations; don't assume fewer partitions always means faster for small data.
-
-## Part B — Replication
-Connect separately to Primary and Replica:
+From the repository root:
 
 ```bash
 cd labs/02-partitioning-replication
-docker compose exec primary psql -U lab -d engineering
-docker compose exec replica psql -U lab -d engineering
+docker compose ps
+docker compose exec -T primary psql -U lab -d engineering -c "SELECT pg_is_in_recovery();"
+docker compose exec -T replica psql -U lab -d engineering -c "SELECT pg_is_in_recovery();"
 ```
 
-Try `SELECT pg_is_in_recovery();` on each server.
+**Expected:** Primary returns `f`; Replica returns `t`.
 
-**Predict:** What happens when you attempt to insert on a read-only standby? Why might a recent Primary write take a moment to appear on the Replica?
+## 2. Understand — Partitioning is not replication
 
-## Part C — Analytical windows
-Write customer running totals, monthly rankings, `LAG()` comparisons and moving averages using `sales_partitioned`.
+- **Partitioning:** Organizes one logical table into physical subsets, often by date.
+- **Replication:** Maintains a read-only standby by replaying Primary changes.
+- **SQL window PARTITION BY:** Defines logical groups for calculation; it does **not** create physical table partitions.
 
-**Key distinction:** SQL window `PARTITION BY` creates logical calculation groups; PostgreSQL table partitioning controls physical organization.
+### Predict before running
 
-## Your work
-Complete the questions in `sql/student_exercises.sql` and document plan differences and replica consistency behavior.
+A query asks for transactions from January to March 2025. Which yearly partitions should PostgreSQL read? What if the filter uses only `customer_id`?
 
-**Remember:** A replica is not a backup, and this demonstration does not perform automatic failover.
+## 3. Explore the query plan
+
+From `labs/02-partitioning-replication`:
+
+```bash
+docker compose exec -T primary psql -U lab -d engineering < sql/02_partition_experiments.sql
+```
+
+Examine `EXPLAIN (ANALYZE, BUFFERS)`. Compare relations scanned, buffer usage and timing.
+
+**Checkpoint:** Does filtering by the partition key exclude irrelevant partitions? If not, inspect the predicate and pruning settings.
+
+**Hint:** Partition pruning can save work, but a small table may still be faster without elaborate partitioning.
+
+## 4. Investigate the Read Replica
+
+Insert a new row **on Primary** and query it on Replica. Inspect replication status on Primary with `pg_stat_replication`.
+
+**Predict:** Can you write directly to Replica? Does it always show a committed Primary row immediately?
+
+**Checkpoint:** Explain asynchronous lag and why a replica is neither a backup nor automatic failover.
+
+## 5. Complete the SQL exercises
+
+Work in [sql/student_exercises.sql](https://github.com/OrPerets/postgres-data-engineering-lab/blob/main/labs/02-partitioning-replication/sql/student_exercises.sql). The assignment covers monthly partition creation, replica diagnostics, running totals, ranking, `LAG`, moving averages and a combined pruning/window query.
+
+### Before moving on
+
+- Can you distinguish physical partitions from logical window partitions?
+- Can you explain why filtering by a partition key changes the plan?
+- Can you route ETL writes to Primary and BI reads to Replica?
+
+**Submit:** Your SQL, execution-plan evidence, and the explanations required by the assignment.
+
+**Next:** [Lab 03 — DWH & ETL](03-dwh-etl.md).
